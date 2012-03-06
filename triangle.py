@@ -2,7 +2,7 @@
 import unittest
 from stlfacets import facets_from_file
 from vector import vector_sub, vector_unit, vector_scalar, vector_cross,\
-    vector_dot, vector_length
+    vector_dot, vector_length, vector_add
 from time import time
 
 
@@ -58,9 +58,13 @@ def split_triangle(normal, v0, v1, v2):
         results.append([min_z, max_z, bottom, u3, u4, inset_direction])        
     
     return results
-    
-    
-    
+
+def z_plane_intersect(p0, p1, cut):
+    s = (cut-p0[2])/(p1[2]-p0[2])
+    u = vector_sub(p1, p0)
+    su = vector_scalar(s, u)
+    p = vector_add(p0, su)
+    return p
 
 class Testing(unittest.TestCase):
 
@@ -108,7 +112,7 @@ class Testing(unittest.TestCase):
      
         facet_generator = facets_from_file('bunny.stl')
         triangles = []
-        z = 80.0
+        z = 10.0
         
         points = []
         triangles = []
@@ -133,12 +137,12 @@ class Testing(unittest.TestCase):
 
         
         f= open('layer.scad','w+')
-        print("polyhedron( points = [", file=f)
-        print ("polyhedron( points = [", file = f)
+
+        f.write ("polyhedron( points = [")
         for p in points:
-            print("    [%3.3f, %3.3f, %3.3f], " % p, file = f)
+            f.write("    [%3.3f, %3.3f, %3.3f],\n" % p)
         
-        print("],\n triangles = %s);" % triangles, file=f)
+        f.write("],\n triangles = %s);\n" % triangles)
         f.close()
         
         
@@ -147,7 +151,16 @@ class Testing(unittest.TestCase):
         s = split_triangle([0,0.1,0.6], triangle[0], triangle[1], triangle[2])
         self.assertEqual(len(s), 2)   
         print("t0 ", s[0])
-        print("t1 ", s[1])                   
+        print("t1 ", s[1])  
+        
+    
+    def test_cut(self):
+        p0 = [0,0,0]
+        p1 = [0,0,1]
+        p = z_plane_intersect(p0, p1, 0.5)
+        
+        self.assertAlmostEqual(p[2], 0.5, 3)
+                         
         
         
 if __name__ == '__main__':

@@ -14,6 +14,23 @@ def tokens_from_file(filename):
     infile.close()
 
 
+def facets_from_file(file_path):
+    
+    def seek_token(token_generator, token_name):
+        token = ""
+        while token != token_name:
+            token = next(token_generator)
+    
+    token_generator =  tokens_from_file(file_path)
+    seek_token( token_generator, 'solid')
+    print ('solid name: %s' % next(token_generator) )
+    
+    while(1):
+        seek_token( token_generator, 'facet')
+        facet = read_facet(token_generator)
+        # can we continue and skip triangles on the plane?
+        yield(facet)
+        
 def read_facet(token_generator ):
 
     normal = ()
@@ -68,22 +85,6 @@ def read_facet(token_generator ):
     return (normal, v0,v1,v2) 
 
 
-def facets_from_file(file_path):
-    
-    def seek_token(token_generator, token_name):
-        token = ""
-        while token != token_name:
-            token = next(token_generator)
-    
-    token_generator =  tokens_from_file(file_path)
-    seek_token( token_generator, 'solid')
-    print ('solid name: %s' % next(token_generator) )
-    
-    while(1):
-        seek_token( token_generator, 'facet')
-        facet = read_facet(token_generator)
-        # can we continue and skip triangles on the plane?
-        yield(facet)
     
 
 class Testing(unittest.TestCase):
