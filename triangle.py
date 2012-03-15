@@ -109,10 +109,10 @@ for (segment = segments)
         """ % ())
         f.close()
 
-     def test_split_triangle(self):
+    def test_split_triangle(self):
         normal, v0,v1,v2 = ((0.998312, 0.05807914, 0.0), (-2.462019, -0.4341192, 10.0), (-2.5, 7.152557e-07, 3.469447e-15), (-2.5, 7.152557e-07, 10.0))
-        print normal, v0,v1,v2
-        print "min_z, max_z, p, u0, u1, inset_direction"
+        print( normal, v0,v1,v2)
+        print( "min_z, max_z, p, u0, u1, inset_direction")
         for min_z, max_z, p, u0, u1, inset_direction in split_triangle(normal, v0,v1,v2):
             print ("%s\t%s\t%s\t%s\t%s\t%s" % (min_z, max_z, p, u0, u1, inset_direction) )
             self.assertLess(0, u1[2])
