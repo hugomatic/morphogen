@@ -1,0 +1,62 @@
+<html>
+<header>
+
+<script>
+
+
+facet_count =0;
+
+function mesh_button_click()
+{
+	var mesh = document.getElementById("mesh_filename").value;
+	var url = '/' + mesh
+	load_server_mesh(url);
+}
+
+function load_server_mesh(url)
+{
+
+
+	
+	var source = new EventSource(url);
+	
+	facet_count = 0;
+	
+	source.addEventListener("facet", function(e) {  
+  		
+  		var obj = JSON.parse(e.data);  
+  		// add_facet(obj.a[0], obj.a[1], obj.a[2], obj.b[0], obj.b[1], obj.b[2], obj.c[0], obj.c[1], obj.c[2]);  
+		facet_count ++;
+			
+    });
+    
+    source.addEventListener("done", function(e) {
+    	source.close();
+    	alert('done: ' + facet_count);
+    });
+    
+    
+}
+		
+function add_facet(x0,y0,z0, x1,y1,z1, x2,y2,z2)
+{
+	var e = document.getElementById("facets_div");  
+	e.innerHTML += "facet: [" + x0 + ", " + y0 + ", " + z0 + "]";
+	e.innerHTML += " [" + x1 + ", " + y1 + ", " + z1 + "]";
+	e.innerHTML += " [" + x2 + ", " + y2 + ", " + z2 + "]";
+	e.innerHTML += "<br>";
+}
+
+</script>
+
+
+</header>
+<body>
+Hello mesh streamer!
+<br>
+<input type="text" id="mesh_filename" value="3D_Knot.stl"></text>
+<button onclick="mesh_button_click();">Stream!</button>
+	<div id=facets_div>
+	</div>
+</body>
+</html>

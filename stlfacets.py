@@ -1,8 +1,5 @@
-"""
-slicer __init__
-"""
 from time import time
-import unittest
+
 
 
 def tokens_from_file(filename):
@@ -86,7 +83,7 @@ def read_facet(token_generator ):
 
 
     
-
+import unittest
 class Testing(unittest.TestCase):
 
           

@@ -4,6 +4,10 @@ import pyopencl as cl
 import numpy
 import time
 
+try:
+    from pyopencl import enqueue_copy as cl_copy
+except:
+    from pyopencl import enqueue_copy_buffer as cl_copy
 
 def segment_segment_intersection(  p0_x,  p0_y,
                                   p1_x,  p1_y,
@@ -100,14 +104,24 @@ def openCl(p0, p1,p2,p3, intersections, coordinates):
     import pyopencl as cl
     
     platform = None
+    print("OpenCL:")
     for p in cl.get_platforms():
+        print("   Platform: %s" % p.name)
         if p.name.find("Apple") > -1:
             platform = p
-    
+        elif p.name.find("NVIDIA CUDA") > -1:    
+            platform = p
+            
     device = None
     for d  in platform.get_devices():
+        print ("  Device: %s" % d.name)
         if d.name.find("ATI") >-1:
+            print ("   Selected!")
             device = d
+        elif d.name.find("GeForce") >-1:
+            device = d
+            print ("   Selected!")
+            
     ctx = cl.Context([device])     
     queue = cl.CommandQueue(ctx)
     
@@ -131,8 +145,8 @@ def openCl(p0, p1,p2,p3, intersections, coordinates):
                                     p0_buf, p1_buf, p2_buf, p3_buf, 
                                     coordinates_buf, intersections_buf)
     
-    cl.enqueue_copy(queue, coordinates, coordinates_buf)
-    cl.enqueue_copy(queue, intersections, intersections_buf)
+    cl_copy(queue, coordinates, coordinates_buf)
+    cl_copy(queue, intersections, intersections_buf)
     return time.time() - t
 
 
@@ -170,9 +184,9 @@ print("\nperforming OpenCL calculations")
 
 opencl_time = openCl(p0, p1,p2,p3, intersections, coordinates)
 
-print intersections
-print coordinates
-print opencl_time
+print (intersections)
+print (coordinates)
+print (opencl_time)
 
 print("\nDoing it in python")
 t = time.time()
@@ -189,9 +203,9 @@ for i in range(data_size):
     intersections[i] = r
 
 python_time = time.time() - t
-print intersections
-print coordinates
-print python_time
+print (intersections)
+print (coordinates)
+print (python_time)
 
 print( "Acceleration %s" % (python_time / opencl_time) )
 
